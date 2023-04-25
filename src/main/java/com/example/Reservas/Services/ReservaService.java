@@ -1,5 +1,7 @@
 package com.example.Reservas.Services;
 
+import com.example.Reservas.DTO.ReservaDTO;
+import com.example.Reservas.Exception.ApiRequestException;
 import com.example.Reservas.Models.Cliente;
 import com.example.Reservas.Models.Habitacion;
 import com.example.Reservas.Models.Reserva;
@@ -8,12 +10,12 @@ import com.example.Reservas.Repositories.HabitacionRepository;
 import com.example.Reservas.Repositories.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class ReservaService {
@@ -31,30 +33,40 @@ public class ReservaService {
     }
 
 
-    public Reserva crearReserva(Integer cedula, Integer numero, LocalDate fechaReserva){
+    public ReservaDTO crearReserva(Integer cedula, Integer numero, String fechaReserva){
         if(cedula < 0 || numero < 0 || fechaReserva == null ) {
-            throw new RuntimeException("Los datos de la solicitud están incompletos");
+            throw new ApiRequestException("Los datos de la solicitud están incompletos");
         }
-        //validamos que la fecha a reservar no sea al dia anterior
-        LocalDate fechaActual = LocalDate.now();
-        if(fechaReserva.isBefore(fechaActual)){
-            throw  new RuntimeException("La fecha de reserva no puede ser anterior al día actual.");
+        //Validamos que la fecha tenga el formato correcto
+        Pattern pattern = Pattern
+                .compile("^\\d{4}-\\d{2}-\\d{2}$");
+        Matcher matcher = pattern.matcher(fechaReserva);
+        if(!matcher.find()){
+            throw new ApiRequestException("La fecha debe ser yyyy-MM-dd");
         }
-
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(fechaReserva, formatter);
+        //Validamos que la fecha no sea anterior a la actual
+        if(date.isBefore(LocalDate.now())){
+            throw new ApiRequestException("La fecha no puede ser anterior a la actual");
+        }
+        //Validamos que el cliente y la habitación existan en base de datos
         Optional<Cliente> cliente =  this.clienteRepository.findById(cedula);
         Optional<Habitacion> habitacion =  this.habitacionRepository.findById(numero);
-
-        //Falta validar que esté disponible la habitación (no tenga reserva para esa fecha)
-
         if(cliente.isPresent() && habitacion.isPresent()){
+            //Validamos que la habitación esté disponible en la fecha indicada
+            List<Integer> habitacionesDisponibles = this.reservaRepository.findHabitacionesDisponibles(fechaReserva);
+            if(!habitacionesDisponibles.contains(numero)){
+                throw new ApiRequestException("La habitación no está disponible en la fecha indicada");
+            }
+            //Creamos la reserva
             Double totalPago = calcularTotalPago(habitacion.get());
-            Reserva reserva = new Reserva(fechaReserva, habitacion.get(), cliente.get(), totalPago );
-            Reserva reserva1 = this.reservaRepository.save(reserva);
-            return reserva1;
+            Reserva reserva1 = this.reservaRepository.save(new Reserva(fechaReserva, habitacion.get(), cliente.get(), totalPago ));
+            //Devolvemos el DTO
+            return new ReservaDTO(reserva1.getFechaReserva(),reserva1.getHabitacion(), reserva1.getCliente(), reserva1.getTotalAPagar());
         }
         else{ 
-            throw new RuntimeException("El cliente o la habitación no están registrados en base de datos");
+            throw new ApiRequestException("El cliente o la habitación no están registrados en base de datos");
             }
     }
 
@@ -65,35 +77,13 @@ public class ReservaService {
         }
         return base;
     }
-//SELECT HABITACION FROM HABITACIONES JOIN COLUMN WHERE HABITACION NOT IN (SELECT HABITACIONES RESERVAS)
-    public List<Reserva> reservasPorFecha (LocalDate fecha) {
-        return this.reservaRepository.findByFechaReserva(fecha);
+
+    public List<Habitacion> habitacionesDisponiblesPorFecha(String fecha){
+            return this.reservaRepository.findHabitacionByFecha(fecha);
     }
 
-    public List<Habitacion> habitacionesReservadasPorFecha(LocalDate fecha){
-        List<Reserva> reservas = reservasPorFecha(fecha);
-        ArrayList<Habitacion> habitacionesReservadas = new ArrayList<>();
-        for (Reserva reserva:
-             reservas) {
-            Habitacion habitacion = reserva.getHabitacion();
-            habitacionesReservadas.add(habitacion);
-        }
-        return habitacionesReservadas;
-    }
-    public List<Habitacion> habitacionesDisponibles(LocalDate fecha){
-        List<Habitacion> habitacionesReservadas = habitacionesReservadasPorFecha(fecha);
-        ArrayList<Integer> numeroHabitacionesReservadas = new ArrayList<>();
-        for (Habitacion h:
-                habitacionesReservadas) {
-            Integer numero = h.getNumero();
-            numeroHabitacionesReservadas.add(numero);
-        }
-        return habitacionRepository.findByNumeroNotIn(numeroHabitacionesReservadas);
-    }
-
-    public List<Habitacion> habitacionesDisponiblesPorTipo(LocalDate fecha, String tipo){
-        List<Habitacion> habitacionesDisponibles = habitacionesDisponibles(fecha);
-        return (habitacionesDisponibles.stream().filter( h -> h.getTipoHabitacion().equalsIgnoreCase(tipo))).collect(Collectors.toList());
+    public List<Habitacion> habitacionesPorFechaYTipo(String fecha, String tipo){
+        return this.reservaRepository.findByFechaAndTipoHabitacion(fecha,tipo);
     }
 
     public List<Reserva> reservasPorCliente (Integer cedula) {

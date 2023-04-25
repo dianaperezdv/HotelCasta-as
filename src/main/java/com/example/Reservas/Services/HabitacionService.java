@@ -1,5 +1,7 @@
 package com.example.Reservas.Services;
 
+import com.example.Reservas.DTO.HabitacionDTO;
+import com.example.Reservas.Exception.ApiRequestException;
 import com.example.Reservas.Models.Habitacion;
 import com.example.Reservas.Repositories.HabitacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,31 +15,18 @@ public class HabitacionService {
     @Autowired
     public HabitacionService(HabitacionRepository habitacionRepository){ this.habitacionRepository = habitacionRepository;}
 
-    public Habitacion crear(Habitacion habitacion){
-        return habitacionRepository.save(habitacion);
-    }
-
-   // public List<Habitacion> buscarHabitacionesDisponiblesFecha(LocalDate fecha){
-     //   return habitacionRepository.findByFechaReserva(fecha);
-    //}
-
-    // uno para traer todas las habitaciones disponibles(que no tengan reserva) por fecha
-    /*public List<Habitacion> disponiblesPorFecha(LocalDate fecha){
-        List<Reseva> reservas = reservaRepository.findByFechaReserva(fecha);
-        List<OtraLista> numeroHabitacion = reservas.stream()
-                .map(Reserva::getHabitacion)
-                .collect(Collectors.toList());
-
-        //Buscar en las reservas la fecha - método dentro de reservas
-        // Retornar las habitaciones que no están registradas en esas reservas
-        //
-
-
+    public HabitacionDTO crear(HabitacionDTO habitacionDTO){
+        if(habitacionDTO.getTipoHabitacion()==null){
+            throw new ApiRequestException("Es necesario el tipo de habitacion, debe ser estándar o premium");
+        } else if (habitacionDTO.getPrecioBase()==null) {
+            throw new ApiRequestException("Falta el precio base de la habitación");
+        } else if (habitacionDTO.getNumero()==null) {
+            throw new ApiRequestException("Falta el número de la habitacion");
+        }
+        Habitacion habitacion = new Habitacion(habitacionDTO.getNumero(), habitacionDTO.getTipoHabitacion(), habitacionDTO.getPrecioBase());
+        this.habitacionRepository.save(habitacion);
+        return  habitacionDTO;
     }
 
 
-    // otro para traer todas las habitaciones disponibles(que no tengan reserva)
-    // pero filtradas por el tipo de habitación, use queryParameters.
-
-     */
 }

@@ -1,8 +1,6 @@
 package com.example.Reservas.Models;
 
 import javax.persistence.*;
-
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -13,11 +11,11 @@ public class Reserva {
     @Column(name="codigoDeReserva")
     private UUID codigoDeReserva;
     @Column(name="fechaReserva")
-    private LocalDate fechaReserva;
-    @ManyToOne
+    private String fechaReserva;
+    @OneToOne
     @JoinColumn(name="numero")
     private Habitacion habitacion;
-    @ManyToOne
+    @OneToMany
     @JoinColumn(name="cedula")
     private Cliente cliente;
     @Column(name="totalAPagar")
@@ -25,7 +23,7 @@ public class Reserva {
 
     public Reserva(){}
 
-    public Reserva(LocalDate fechaReserva, Habitacion habitacion, Cliente cliente, Double totalAPagar) {
+    public Reserva(String fechaReserva, Habitacion habitacion, Cliente cliente, Double totalAPagar) {
         this.fechaReserva = fechaReserva;
         this.habitacion = habitacion;
         this.cliente = cliente;
@@ -37,7 +35,7 @@ public class Reserva {
         return codigoDeReserva;
     }
 
-    public LocalDate getFechaReserva() {
+    public String getFechaReserva() {
         return fechaReserva;
     }
 
