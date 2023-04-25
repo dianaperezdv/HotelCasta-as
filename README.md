@@ -1,6 +1,6 @@
-# Proyecto de Mensajería Express  <img alt="Java" height="40" width="60" src="https://static.vecteezy.com/system/resources/previews/012/980/756/original/truck-with-stop-watch-express-delivery-icon-for-shipping-services-ecomers-signs-illustration-png.png">
+# Hotel Castañas Microservicio  <img alt="Java" height="40" width="60" src="https://static.vecteezy.com/system/resources/thumbnails/014/011/391/small/hotel-3d-rendering-isometric-icon-png.png">
 
-El proyeco "Mensajería Express APIREST" es una aplicación realizada con Spring Boot que permite a los usuarios hacer seguimiento y control de los clientes, empleados y de los paquetes envíados, todo a través de una interfaz web. La API utiliza el protocolo HTTP para permitir que los usuarios interactúen con el sistema a través de una serie de endpoints de API definidos.
+El proyeco "Hotel Castañas Microservicio" es una aplicación realizada con Spring Boot que permite a los usuarios crear reservas en la base de datos, junto con el manejo de las habitaciones y los clientes relacionados a estas. La API utiliza el protocolo HTTP para permitir que los usuarios interactúen con el sistema a través de una serie de endpoints de API definidos.
 
 El gestor de dependencias utilizado es Gradle-Groovy y la versión de Java es Java 11.
 La base de datos cuenta con un motor en MySQL manejado con JPA e Hibernate.
@@ -36,7 +36,7 @@ spring.mvc.pathmatch.matching-strategy=ant-path-matcher
 ## Documentación <img align="center" alt="Documentacion" height="40" width="40" src="https://www.alura.com.br/assets/api/cursos/512/swagger-documentando-apis.png">
 La documentación de la API se genera automáticamente con Swagger. Este servicio ofrece una documentación que es fácil de entender y es amigable con todo tipo de usuarios.
 
-Para acceder a la documentación, abra un navegador web y vaya a [Documentación Swagger](https://finalprojectmakaiaspring-production.up.railway.app/swagger-ui/index.html#/).
+Para acceder a la documentación, abra un navegador web y vaya a [Documentación Swagger](http://hotelcastanas-production.up.railway.app/swagger-ui/index.html#/).
 
 ## Pruebas Unitarias <img align="center" alt="Pruebas" height="40" width="40" src="https://media.giphy.com/media/1sMGC0XjA1Hk58wppo/giphy.gif">
 Se han incluido pruebas unitarias utilizando Mockito y JUnit para asegurar que los servicios de Cliente, Envío y Empleado funcionan correctamente.
@@ -46,9 +46,9 @@ Las pruebas unitarias se encuentran en la carpeta src/test/java del proyecto.
 Este proyecto utiliza el patrón de diseño DTO (Data Transfer Object) para transferir datos entre las diferentes capas de la aplicación. Los DTO son objetos simples que contienen campos y métodos de acceso, y se utilizan para transferir datos entre los controladores y los servicios.
 En este caso se utilizan para facilitar el manejo de las respuestas y el control del manejo de los datos sensibles.
 
-## Diagrama del Modelo Entidad-Relación <img align="center" alt="MySQL" height="40" width="40" src="https://d1.awsstatic.com/asset-repository/products/amazon-rds/1024px-MySQL.ff87215b43fd7292af172e2a5d9b844217262571.png">
+## Diagrama del Modelo Entidad-Relación <img align="center" alt="MySQL" height="40" width="60" src="https://d1.awsstatic.com/asset-repository/products/amazon-rds/1024px-MySQL.ff87215b43fd7292af172e2a5d9b844217262571.png">
 Este es el diagrama del modelo entidad-relación para la base de datos MySQL del proyecto de sistema de reservas:
-![diagrama](https://github.com/dianaperezdv/finalProjectMakaiaSpring/blob/4781385d15d368650a77be796ec167559e58cdcb/DB_DIAGRAM.png)
+![diagrama](https://github.com/dianaperezdv/HotelCastanas/blob/3c31af30b7109fbb41aa9d896249a34c0d89908e/DB_DIAGRAM.png)
 
 -
 ## Diagrama del proyecto por paquetes
