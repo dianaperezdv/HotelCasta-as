@@ -3,10 +3,10 @@ name: Continuous integration with github
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   test_build:
